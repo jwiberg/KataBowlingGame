@@ -50,8 +50,46 @@ public class BowlingGameTest {
 	}
 
 	@Test
+	public void getHeartbreakScore() {
+		bowlingGame.addThrows(9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0,
+				9, 0, 9, 0);
+		assertEquals(90, bowlingGame.getScore());
+	}
+
+	@Test
 	public void getScoreAfterFirstSpare() {
 		bowlingGame.addThrows(5, 5, 5);
 		assertEquals(20, bowlingGame.getScore());
+	}
+
+	@Test
+	public void getScoreAfterFirstStrike() {
+		bowlingGame.addThrows(10, 5, 4);
+		assertEquals(28, bowlingGame.getScore());
+	}
+
+	@Test
+	public void getScoreAfterSecondStrike() {
+		bowlingGame.addThrows(10, 10);
+		assertEquals(30, bowlingGame.getScore());
+	}
+
+	@Test
+	public void getScoreAfterThirdStrike() {
+		bowlingGame.addThrows(10, 10, 10);
+		assertEquals(60, bowlingGame.getScore());
+	}
+
+	@Test
+	public void getScoreIfSpareEveryRound() {
+		bowlingGame.addThrows(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+				5, 5, 5, 5, 5);
+		assertEquals(150, bowlingGame.getScore());
+	}
+
+	@Test
+	public void getScoreOfPerfectGame() {
+		bowlingGame.addThrows(10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+		assertEquals(300, bowlingGame.getScore());
 	}
 }

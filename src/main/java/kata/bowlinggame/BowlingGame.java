@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BowlingGame {
-
+	private static final int BASE_FRAME_COUNT = 10;
 	private final List<Frame> allFrames = new ArrayList<Frame>();
 	private Frame currentFrame = new Frame();
 
 	public int getScore() {
-		int score = 0;
-		for (int i = 0; i < allFrames.size(); i++) {
-			Frame frame = allFrames.get(i);
-			if (i < allFrames.size() - 1 && frame.isSpare()) {
-				score += frame.getScore();
-				score += allFrames.get(i + i).getFirstThrow();
-			} else {
-				score += frame.getScore();
+		Integer score = 0;
+		for (int frameNumber = 0; frameNumber < allFrames.size()
+				&& frameNumber < BASE_FRAME_COUNT; frameNumber++) {
+			score += allFrames.get(frameNumber).getScore();
+			if (isStrike(frameNumber)) {
+				score += countStrikeBonus(frameNumber);
+			} else if (isSpare(frameNumber)) {
+				score += countSpareBonus(frameNumber);
 			}
 		}
 		return score;
@@ -30,48 +30,47 @@ public class BowlingGame {
 
 	private void addThrow(int throwScore) {
 		if (currentFrame.getFirstThrow() == null) {
-			currentFrame = new Frame();
 			currentFrame.setFirstThrow(throwScore);
 			allFrames.add(currentFrame);
+			if (throwScore == 10) {
+				currentFrame = new Frame();
+			}
 		} else {
 			currentFrame.setSecondThrow(throwScore);
 			currentFrame = new Frame();
 		}
 	}
 
-	public class Frame {
-		private Integer firstThrow;
-		private Integer secondThrow;
+	private boolean hasNextFrame(int frameNumber) {
+		return frameNumber < allFrames.size() - 1;
+	}
 
-		public int getScore() {
-			if (secondThrow == null) {
-				return this.firstThrow;
-			}
-			return this.firstThrow + this.secondThrow;
-		}
+	private Frame getNextFrame(int frameNumber) {
+		return allFrames.get(frameNumber + 1);
+	}
 
-		public boolean isSpare() {
-			if (this.firstThrow != null && this.secondThrow != null
-					&& this.getScore() == 10) {
-				return true;
-			}
-			return false;
+	private int countStrikeBonus(int frameNumber) {
+		int bonus = 0;
+		bonus += getNextFrame(frameNumber).getFirstThrow();
+		if (!getNextFrame(frameNumber).isStrike()) {
+			bonus += getNextFrame(frameNumber).getSecondThrow();
+		} else if (hasNextFrame(frameNumber + 1)) {
+			bonus += getNextFrame(frameNumber + 1).getFirstThrow();
 		}
+		return bonus;
+	}
 
-		public Integer getFirstThrow() {
-			return firstThrow;
-		}
+	private int countSpareBonus(int frameNumber) {
+		return allFrames.get(frameNumber + 1).getFirstThrow();
+	}
 
-		public void setFirstThrow(Integer firstThrow) {
-			this.firstThrow = firstThrow;
-		}
+	private boolean isSpare(int frameNumber) {
+		return hasNextFrame(frameNumber)
+				&& allFrames.get(frameNumber).isSpare();
+	}
 
-		public Integer getSecondThrow() {
-			return secondThrow;
-		}
-
-		public void setSecondThrow(Integer secondThrow) {
-			this.secondThrow = secondThrow;
-		}
+	private boolean isStrike(int frameNumber) {
+		return hasNextFrame(frameNumber)
+				&& allFrames.get(frameNumber).isStrike();
 	}
 }
